@@ -40,7 +40,15 @@ function UserHeader() {
             Kaliyappan
           </Text>
           <Flex gap={2} alignItems={"center"}>
-            <Text fontSize={"sm"}>kaliyappan_r4</Text>
+            <Text
+              fontSize={{
+                base: "md",
+                md: "xl",
+                lg: "lg",
+              }}
+            >
+              kaliyappan_r4
+            </Text>
             <Text
               fontSize={"xs"}
               bg={"gray.dark"}
@@ -53,7 +61,14 @@ function UserHeader() {
           </Flex>
         </Box>
         <Box>
-          <Avatar name="kaliyappan" src="/zuck-avatar.png" size={"xl"} />
+          <Avatar
+            name="kaliyappan"
+            src="/zuck-avatar.png"
+            size={{
+              base: "md",
+              md: "xl",
+            }}
+          />
         </Box>
       </Flex>
 
@@ -74,10 +89,8 @@ function UserHeader() {
                 <CgMoreO size={24} cursor={"pointer"} />
               </MenuButton>
               <Portal>
-                <MenuList >
-                  <MenuItem  onClick={copyURL}>
-                    Copy Link
-                  </MenuItem>
+                <MenuList>
+                  <MenuItem onClick={copyURL}>Copy Link</MenuItem>
                 </MenuList>
               </Portal>
             </Menu>

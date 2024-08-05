@@ -11,6 +11,7 @@ const Actions = ({ liked, setLiked }) => {
         role="img"
         viewBox="0 0 24 22"
         width="20"
+        cursor={"pointer"}
         onClick={() => setLiked(!liked)}
       >
         <path
@@ -28,6 +29,7 @@ const Actions = ({ liked, setLiked }) => {
         role="img"
         viewBox="0 0 24 24"
         width="20"
+        cursor={"pointer"}
       >
         <title>Comment</title>
         <path
@@ -47,6 +49,7 @@ const Actions = ({ liked, setLiked }) => {
         role="img"
         viewBox="0 0 24 24"
         width="20"
+        cursor={"pointer"}
       >
         <title>Repost</title>
         <path
@@ -63,6 +66,7 @@ const Actions = ({ liked, setLiked }) => {
         role="img"
         viewBox="0 0 24 24"
         width="20"
+        cursor={"pointer"}
       >
         <title>Share</title>
         <line

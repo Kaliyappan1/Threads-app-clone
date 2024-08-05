@@ -74,7 +74,7 @@ function UserPost({postImg, postTitle, likes, replies}) {
                 <Actions liked={liked} setLiked={setLiked} />
           </Flex>
           <Flex gap={2} alignItems={"center"}>
-            <Text color={"gray.light"} fontSize={"sm"}>{likes} likes</Text>
+            <Text color={"gray.light"} fontSize={"sm"}>{likes + (liked ? 1 : 0)} likes</Text>
             <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
             <Text color={"gray.light"} fontSize={"sm"}>{replies} replies</Text>
           </Flex>
