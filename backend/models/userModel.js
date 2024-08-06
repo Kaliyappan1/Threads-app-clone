@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema({
         type: String,
         default: "",
     },
-    followsers: {
+    followers: {
         type: [String],
         default: [],
     },
@@ -41,6 +41,6 @@ const userSchema = mongoose.Schema({
     timestamps: true  ,
 });
 
-const User = mongoose.model('User, userSchema');
+const User = mongoose.model('User', userSchema);
 
 export default User;
