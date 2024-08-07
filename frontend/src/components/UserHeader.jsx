@@ -63,7 +63,7 @@ function UserHeader() {
         <Box>
           <Avatar
             name="kaliyappan"
-            src="https://randomuser.me/api/"
+            src="/zuck-avatar.png"
             size={{
               base: "md",
               md: "xl",
