@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import userAtom from "../assets/userAtom";
 import usePreviewImg from "../hooks/usePreviewImg";
+import useShowToast from "../hooks/useShowToast";
 
 export default function UpdateProfilePage() {
   const [user, setUser] = useRecoilState(userAtom);
@@ -27,10 +28,38 @@ export default function UpdateProfilePage() {
 
   const fileRef = useRef(null);
 
+  const showToast = useShowToast();
+
   const {handleImageChange, imgUrl }= usePreviewImg()
 
+  const handleSubmit =  async(e) => {
+    e.preventDefault();
+    try {
+        const res = await fetch(`/api/users/update/${user._id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({...inputs, profilePic: imgUrl}),
+        })
+        const data = await res.json();
+        if (data.error) {
+            showToast("Error", data.error, "error");
+            return;
+        }
+        showToast("Success", "Profile updated successfully", "success");
+
+        setUser(data);
+        localStorage.setItem("user-threads", JSON.stringify(data));
+        
+    } catch (error) {
+        showToast("Error",error, "error");
+        
+    }
+  }
 
   return (
+    <form onSubmit={handleSubmit} >
     <Flex align={"center"} justify={"center"} my={6}>
       <Stack
         spacing={4}
@@ -57,7 +86,7 @@ export default function UpdateProfilePage() {
             </Center>
           </Stack>
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>Full name</FormLabel>
           <Input
             placeholder="John Doe"
@@ -67,17 +96,17 @@ export default function UpdateProfilePage() {
             onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>User name</FormLabel>
           <Input
             placeholder="Johndoe"
             _placeholder={{ color: "gray.500" }}
             type="text"
-            value={inputs.name}
+            value={inputs.username}
             onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>Email address</FormLabel>
           <Input
             placeholder="your-email@example.com"
@@ -87,17 +116,17 @@ export default function UpdateProfilePage() {
             onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>Bio</FormLabel>
           <Input
             placeholder="Your bio..."
             _placeholder={{ color: "gray.500" }}
-            type="email"
+            type="text"
             value={inputs.bio}
             onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>Password</FormLabel>
           <Input
             placeholder="password"
@@ -125,11 +154,14 @@ export default function UpdateProfilePage() {
             _hover={{
               bg: "green.500",
             }}
+            type="submit"
           >
             Submit
           </Button>
         </Stack>
       </Stack>
     </Flex>
+    </form>
   );
+
 }

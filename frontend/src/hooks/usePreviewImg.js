@@ -19,7 +19,6 @@ function usePreviewImg() {
         }
         
     };
-    console.log(imgUrl);
     
     return {
         imgUrl,
