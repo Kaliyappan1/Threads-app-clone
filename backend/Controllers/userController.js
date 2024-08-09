@@ -9,11 +9,11 @@ const getUserProfile = async (req, res) => {
       .select("-password")
       .select("-updatedAt");
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(400).json({ error: "User not found" });
     }
     res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in getUserprofile", err.message);
   }
 };
@@ -51,7 +51,7 @@ const signupUser = async (req, res) => {
       res.status(400).json({ error: "Invalid user data" });
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in signupUser", err.message);
   }
 };
@@ -66,7 +66,7 @@ const loginUser = async (req, res) => {
     );
 
     if (!user || !isPasswordCorrect)
-      return res.status(400).json({ message: "Invalid username or password" });
+      return res.status(400).json({ error: "Invalid username or password" });
 
     generateTokenAndSetCookie(user._id, res);
 
@@ -77,7 +77,7 @@ const loginUser = async (req, res) => {
       username: user.username,
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in loginUser", err.message);
   }
 };
@@ -85,9 +85,9 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     res.cookie("jwt", "", { maxAge: 1 });
-    res.status(200).json({ message: "User logged out successfully" });
+    res.status(200).json({ error: "User logged out successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in logoutUser", err.message);
   }
 };
@@ -104,7 +104,7 @@ const followUnFollowUser = async (req, res) => {
         .json({ message: "you cannot follow/unfollow yourself" });
 
     if (!userToModify || !currentUser)
-      return res.status(400).json({ message: "User not found" });
+      return res.status(400).json({ error: "User not found" });
 
     const isFollowing = currentUser.following.includes(id);
 
@@ -120,7 +120,7 @@ const followUnFollowUser = async (req, res) => {
       res.status(200).json({ message: "User followed successfully" });
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in followunfollow ", err.message);
   }
 };
@@ -131,13 +131,13 @@ const updateUser = async (req, res) => {
   try {
     let user = await User.findById(userId);
     if (!user) {
-      return res.status(400).json({ message: "user not found" });
+      return res.status(400).json({ error: "user not found" });
     }
 
     if (req.params.id !== userId.toString()) {
       return res
         .status(400)
-        .json({ message: "You cannot update other user's profile" });
+        .json({ error: "You cannot update other user's profile" });
     }
 
     if (password) {
@@ -156,7 +156,7 @@ const updateUser = async (req, res) => {
 
     res.status(200).json({ message: "profile update successfully", user });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in followunfollow ", err.message);
   }
 };
