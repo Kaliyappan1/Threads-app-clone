@@ -115,6 +115,7 @@ export default function LoginCard() {
                   bg: useColorModeValue("gray.700", "gray.800"),
                 }}
                 onClick={handleLogin}
+                type="button"
               >
                 Login
               </Button>
@@ -125,6 +126,7 @@ export default function LoginCard() {
                 <Link
                   color={"blue.400"}
                   onClick={() => setAuthScreen("signup")}
+                  
                 >
                   Signup
                 </Link>

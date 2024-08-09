@@ -143,6 +143,7 @@ export default function SignupCard() {
                   bg: useColorModeValue("gray.700", "gray.800"),
                 }}
                 onClick={handleSignup}
+                type="button"
               >
                 Sign up
               </Button>

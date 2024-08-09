@@ -4,7 +4,6 @@ import { useSetRecoilState } from "recoil";
 import userAtom from "../assets/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { CgLogOut } from "react-icons/cg";
-import { Navigate } from "react-router-dom";
 
 function LogoutButton() {
   const setUser = useSetRecoilState(userAtom);
