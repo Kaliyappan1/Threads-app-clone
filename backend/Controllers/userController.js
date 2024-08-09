@@ -82,13 +82,18 @@ const loginUser = async (req, res) => {
   }
 };
 
-const logoutUser = async (req, res) => {
+const logoutUser = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 1 });
-    res.status(200).json({ error: "User logged out successfully" });
+    res.cookie("jwt", "", {
+      httpOnly: true, // Prevents JavaScript access to the cookie
+      sameSite: "strict", // CSRF protection
+      secure: process.env.NODE_ENV === 'production', // Secure flag based on environment
+      maxAge: 0, // Setting maxAge to 0 effectively deletes the cookie
+    });
+    res.status(200).json({ message: "User logged out successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in logoutUser", err.message);
+    console.log("Error in logoutUser: ", err.message); // Updated error logging
   }
 };
 
