@@ -22,7 +22,7 @@ function usePreviewImg() {
     
     return {
         imgUrl,
-        handleImageChange
+        handleImageChange, setImgUrl
     }
   
 }

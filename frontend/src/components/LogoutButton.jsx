@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, useColorModeValue } from "@chakra-ui/react";
 import React from "react";
 import { useSetRecoilState } from "recoil";
 import userAtom from "../assets/userAtom";
@@ -38,6 +38,7 @@ function LogoutButton() {
       right={"30px"}
       size={"sm"}
       onClick={handleLogout}
+      bg={useColorModeValue("gray.300", "gray.dark")}
     >
       <CgLogOut size={20}/>
     </Button>
