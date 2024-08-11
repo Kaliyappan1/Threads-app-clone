@@ -1,7 +1,7 @@
-import { Button, Flex, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import useShowToast from "../hooks/useShowToast";
+import Post from "../../../backend/models/postModel";
 
 function HomePage() {
   const [posts, setPosts] = useState([]);
@@ -14,7 +14,12 @@ function HomePage() {
       try {
         const res = await fetch("/api/posts/feed");
         const data = await res.json();
+        if (data.error) {
+          showToast("Error", data.error, "error");
+          return;
+        }
         console.log(data);
+        setPosts(data);
       } catch (error) {
         showToast("Error", error.message, "error");
       } finally {
@@ -25,14 +30,20 @@ function HomePage() {
   }, [showToast]);
 
   return (
-    <Link to={"/kaliyappan"}>
-      <Flex w={"full"} justifyContent={"center"}>
-        <Button mx={"auto"} bg={useColorModeValue("gray.300", "gray.dark")}>
-          {" "}
-          Visit Profile Page
-        </Button>
-      </Flex>
-    </Link>
+    <>
+      {!loading && posts.length === 0 && (
+        <h1>Follow some users to see the feed</h1>
+      )}
+      {loading && (
+        <Flex justify={"center"}>
+          <Spinner size={"xl"} />
+        </Flex>
+      )}
+
+      {posts.map((post) => {
+        <Post key={post._id} post={post} postedby={post.postedby} />;
+      })}
+    </>
   );
 }
 
