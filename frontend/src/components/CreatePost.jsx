@@ -20,11 +20,12 @@ import {
 } from "@chakra-ui/react";
 import React, { useRef, useState } from "react";
 import usePreviewImg from "../hooks/usePreviewImg";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { BsFillImageFill } from "react-icons/bs";
 import { useParams } from "react-router-dom";
+import postAtom from "../atoms/postAtom";
 
 const MAX_CHAR = 500;
 
@@ -40,6 +41,7 @@ function CreatePost() {
   const showToast = useShowToast();
   const [loading, setLoading] = useState(false);
   const {username} = useParams();
+  const [posts, setPosts] = useRecoilState(postAtom)
 
 
   const handleTextChange = (e) => {
@@ -92,11 +94,11 @@ function CreatePost() {
         position={"fixed"}
         bottom={10}
         right={10}
-        leftIcon={<AddIcon />}
         bg={useColorModeValue("gray.300", "gray.dark")}
         onClick={onOpen}
+        size={{base: "sm", sm: "md", md: "lg"}}
       >
-        Post
+        <AddIcon />
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>

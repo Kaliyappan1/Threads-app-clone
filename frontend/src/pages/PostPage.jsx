@@ -12,11 +12,12 @@ import Actions from "../components/Actions";
 import { useEffect, useState } from "react";
 import useGetUserProfile from "../hooks/useGetUserProfile";
 import useShowToast from "../hooks/useShowToast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
+import Commend from "../components/Commend";
 
 function PostPage() {
   const { user, loading } = useGetUserProfile();
@@ -24,6 +25,7 @@ function PostPage() {
   const showToast = useShowToast();
   const { id } = useParams();
   const currentUser = useRecoilValue(userAtom);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getPost = async () => {
@@ -43,7 +45,24 @@ function PostPage() {
     getPost();
   }, [showToast, id]);
 
-  const handleDeletePost = async (e) => {};
+  const handleDeletePost = async () => {
+    try {
+      if (!window.confirm(`Are you sure you want to delete this post?`)) return;
+
+      const res = await fetch(`/api/posts/${post._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+      showToast("Success", "Post deleted", "success");
+      navigate(`/${user.username}`);
+    } catch (error) {
+      showToast("Error", error.message, "error");
+    }
+  };
 
   if (!user && loading) {
     return (
@@ -78,7 +97,11 @@ function PostPage() {
           </Text>
 
           {currentUser?._id === user._id && (
-            <DeleteIcon size={20} onClick={handleDeletePost} />
+            <DeleteIcon
+              size={20}
+              cursor={"pointer"}
+              onClick={handleDeletePost}
+            />
           )}
         </Flex>
       </Flex>
@@ -110,6 +133,13 @@ function PostPage() {
       </Flex>
 
       <Divider my={4} />
+      {post.replies.map((reply) => (
+        <Commend
+          key={reply._id}
+          reply={reply}
+          lastReply={reply._id === post.replies[post.replies.lenght - 1]}
+        />
+      ))}
     </>
   );
 }
