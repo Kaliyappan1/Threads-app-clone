@@ -1,7 +1,8 @@
 import { Flex, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
-import Post from "../../../backend/models/postModel";
+import Post from "../components/Post";
+
 
 function HomePage() {
   const [posts, setPosts] = useState([]);
@@ -40,9 +41,11 @@ function HomePage() {
         </Flex>
       )}
 
-      {posts.map((post) => {
-        <Post key={post._id} post={post} postedby={post.postedby} />;
-      })}
+
+      {posts.map((post) => (
+        <Post key={post._id} post={post} postedBy={post.postedBy} />
+      ))}
+
     </>
   );
 }

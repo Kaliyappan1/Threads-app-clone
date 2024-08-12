@@ -24,6 +24,7 @@ import { useRecoilValue } from "recoil";
 import userAtom from "../assets/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { BsFillImageFill } from "react-icons/bs";
+import { useParams } from "react-router-dom";
 
 const MAX_CHAR = 500;
 
@@ -38,6 +39,7 @@ function CreatePost() {
   const user = useRecoilValue(userAtom);
   const showToast = useShowToast();
   const [loading, setLoading] = useState(false);
+  const {username} = useParams();
 
 
   const handleTextChange = (e) => {
