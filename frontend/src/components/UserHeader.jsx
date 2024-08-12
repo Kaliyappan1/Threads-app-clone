@@ -24,7 +24,7 @@ function UserHeader({ user }) {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom);
   const [following, setFollowing] = useState(
-    user.followers.includes(currentUser._id)
+    user.followers.includes(currentUser?._id)
   );
   const showToast = useShowToast();
   const [updating, setUpdating] = useState(false);
@@ -70,7 +70,7 @@ function UserHeader({ user }) {
         user.followers.pop();
       } else {
         showToast("Success", `Followed ${user.name}`, "success");
-        user.followers.push(currentUser._id);
+        user.followers.push(currentUser?._id);
       }
 
       setFollowing(!following);
@@ -137,12 +137,12 @@ function UserHeader({ user }) {
 
       <Text>{user.bio}</Text>
 
-      {currentUser._id === user._id && (
+      {currentUser?._id === user._id && (
         <Link to="/update">
           <Button size={"sm"}>Update Profile</Button>
         </Link>
       )}
-      {currentUser._id !== user._id && (
+      {currentUser?._id !== user._id && (
         <Button size={"sm"} onClick={handleFollowUnfollow} isLoading={updating}>
           {following ? "Unfollow" : "Follow"}
         </Button>
