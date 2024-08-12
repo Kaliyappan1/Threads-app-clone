@@ -1,6 +1,6 @@
 import { Flex, Image, useColorMode } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import userAtom from "../assets/userAtom";
+import userAtom from "../atoms/userAtom";
 import { BsFillHouseExclamationFill, BsPersonCircle } from "react-icons/bs";
 import {Link, Link as RouterLink} from "react-router-dom"
 

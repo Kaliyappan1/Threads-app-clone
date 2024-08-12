@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import { BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
 import { useRecoilValue } from "recoil";
-import userAtom from "../assets/userAtom";
+import userAtom from "../atoms/userAtom";
 import { Link } from "react-router-dom";
 import useShowToast from "../hooks/useShowToast";
 

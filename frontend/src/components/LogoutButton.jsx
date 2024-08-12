@@ -1,7 +1,7 @@
 import { Button, useColorModeValue } from "@chakra-ui/react";
 import React from "react";
 import { useSetRecoilState } from "recoil";
-import userAtom from "../assets/userAtom";
+import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { CgLogOut } from "react-icons/cg";
 

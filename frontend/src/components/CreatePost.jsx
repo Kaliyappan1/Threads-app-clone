@@ -21,7 +21,7 @@ import {
 import React, { useRef, useState } from "react";
 import usePreviewImg from "../hooks/usePreviewImg";
 import { useRecoilValue } from "recoil";
-import userAtom from "../assets/userAtom";
+import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { BsFillImageFill } from "react-icons/bs";
 import { useParams } from "react-router-dom";
