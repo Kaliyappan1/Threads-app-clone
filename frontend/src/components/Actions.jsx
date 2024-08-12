@@ -4,10 +4,12 @@ import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
 
-const Actions = ({ post }) => {
+const Actions = ({ post: post_ }) => {
   const user = useRecoilValue(userAtom);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(post_.likes.includes(user?._id));
   const showToast = useShowToast();
+  const [post, setPost] = useState(post_);
+  const [isLiking, setIsLiking] = useState(false);
 
   const handleLikeAndUnlike = async () => {
     if (!user)
@@ -16,6 +18,8 @@ const Actions = ({ post }) => {
         "You must be logged in to like a post",
         "error"
       );
+      
+    setIsLiking(true);
     try {
       const res = await fetch("/api/posts/like/" + post._id, {
         method: "PUT",
@@ -28,10 +32,17 @@ const Actions = ({ post }) => {
         showToast("Error", data.error, "error");
         return;
       }
-      console.log(data);
-      
+      if (!liked) {
+        setPost({ ...post, likes: [...post.likes, user._id] });
+      } else {
+        setPost({ ...post, likes: post.likes.filter((id) => id !== user._id) });
+      }
+
+      setLiked(!liked);
     } catch (error) {
       showToast("Error", error.message, "error");
+    }finally {
+      setIsLiking(false);
     }
   };
   return (
