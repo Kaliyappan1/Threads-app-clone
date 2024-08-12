@@ -2,19 +2,31 @@ import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import { v2 as cloudinary } from "cloudinary";
+import mongoose from "mongoose";
 const getUserProfile = async (req, res) => {
-  const { username } = req.params;
+  const { query } = req.params;
   try {
-    const user = await User.findOne({ username })
-      .select("-password")
-      .select("-updatedAt");
+    let user;
+
+    //query is userId
+    if (mongoose.Types.ObjectId.isValid(query)) {
+      user = await User.findOne({ _id: query })
+        .select("-password")
+        .select("-updatedAt");
+    } else {
+      // query is username
+      user = await User.findOne({ username: query })
+        .select("-password")
+        .select("-updatedAt");
+    }
+
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in getUserprofile", err.message);
+    console.log("Error in getUser profile", err.message);
   }
 };
 
@@ -91,7 +103,7 @@ const logoutUser = (req, res) => {
     res.cookie("jwt", "", {
       httpOnly: true, // Prevents JavaScript access to the cookie
       sameSite: "strict", // CSRF protection
-      secure: process.env.NODE_ENV === 'production', // Secure flag based on environment
+      secure: process.env.NODE_ENV === "production", // Secure flag based on environment
       maxAge: 0, // Setting maxAge to 0 effectively deletes the cookie
     });
     res.status(200).json({ message: "User logged out successfully" });
@@ -136,8 +148,7 @@ const followUnFollowUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { name, email, username, password, bio } = req.body;
-  let { profilePic} = req.body;
- 
+  let { profilePic } = req.body;
 
   const userId = req.user._id;
 
@@ -161,7 +172,9 @@ const updateUser = async (req, res) => {
 
     if (profilePic) {
       if (user.profilePic) {
-        await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0])
+        await cloudinary.uploader.destroy(
+          user.profilePic.split("/").pop().split(".")[0]
+        );
       }
       const uploadedResponse = await cloudinary.uploader.upload(profilePic);
       profilePic = uploadedResponse.secure_url;
@@ -177,10 +190,10 @@ const updateUser = async (req, res) => {
 
     user.password = null;
 
-    res.status(200).json( user );
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in updateUser : ",err.message);
+    console.log("Error in updateUser : ", err.message);
   }
 };
 
