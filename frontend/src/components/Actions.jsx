@@ -10,9 +10,29 @@ const Actions = ({ post }) => {
   const showToast = useShowToast();
 
   const handleLikeAndUnlike = async () => {
-    
+    if (!user)
+      return showToast(
+        "Error",
+        "You must be logged in to like a post",
+        "error"
+      );
     try {
-    } catch (error) {}
+      const res = await fetch("/api/posts/like/" + post._id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+      console.log(data);
+      
+    } catch (error) {
+      showToast("Error", error.message, "error");
+    }
   };
   return (
     <Flex flexDirection={"column"}>
