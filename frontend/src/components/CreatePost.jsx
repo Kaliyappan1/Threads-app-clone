@@ -77,7 +77,6 @@ function CreatePost() {
       if (username === user.username) {
         setPosts([data, ...posts]);
       }
-      setPosts([data, ...posts]);
       onClose();
       setPostText("");
       setImgUrl("");
