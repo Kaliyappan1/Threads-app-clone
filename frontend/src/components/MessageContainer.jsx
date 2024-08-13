@@ -12,6 +12,7 @@ import Message from "./Message";
 import MessageInput from "./MessageInput";
 
 function MessageContainer() {
+
   return (
     <Flex
       flex={70}
@@ -60,17 +61,6 @@ function MessageContainer() {
             <Message ownMessage={false}/>
             <Message ownMessage={false}/>
             <Message ownMessage={true}/>
-            <Message ownMessage={true}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={true}/>
-            <Message ownMessage={true}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={true}/>
-            <Message ownMessage={true}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={false}/>
             <Message ownMessage={true}/>
       </Flex>
       <MessageInput />

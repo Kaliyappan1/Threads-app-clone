@@ -20,7 +20,7 @@ async function sendMessage(req, res) {
       await conversation.save();
     }
     const newMessage = new Message({
-      conversation: conversation._id,
+      conversationId: conversation._id,
       sender: senderId,
       text: message,
     });
@@ -61,5 +61,24 @@ async function getMessages(req, res) {
 		res.status(500).json({ error: error.message });
 	}
 }
+async function getConversations(req, res) {
+	const userId = req.user._id;
+	try {
+		const conversations = await Conversation.find({ participants: userId }).populate({
+			path: "participants",
+			select: "username profilePic",
+		});
 
-export { sendMessage, getMessages };
+		// remove the current user from the participants array
+		conversations.forEach((conversation) => {
+			conversation.participants = conversation.participants.filter(
+				(participant) => participant._id.toString() !== userId.toString()
+			);
+		});
+		res.status(200).json(conversations);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+}
+
+export { sendMessage, getMessages, getConversations };

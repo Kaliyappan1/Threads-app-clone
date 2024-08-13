@@ -1,10 +1,10 @@
 import express from 'express';
 import protectRoute from '../middlewares/protectRoute.js';
-import { sendMessage, getMessages } from '../Controllers/messageController.js';
+import { sendMessage, getMessages, getConversations } from '../Controllers/messageController.js';
 
 const router = express.Router()
 
-router.get("/:otherUserId", protectRoute, getMessages)
+router.get("/:conversations", protectRoute, getConversations)
 router.get("/:otherUserId", protectRoute, getMessages)
 router.post("/", protectRoute, sendMessage)
 
