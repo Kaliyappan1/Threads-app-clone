@@ -8,7 +8,8 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import React from "react";
+import Message from "./Message";
+import MessageInput from "./MessageInput";
 
 function MessageContainer() {
   return (
@@ -32,10 +33,11 @@ function MessageContainer() {
         flexDir={"column"}
         gap={4}
         my={4}
+        p={2}
         height={"400px"}
-        overflowY={"scroll"}
+        overflowY={"auto"}
       >
-        {true &&
+        {false &&
           [...Array(5)].map((_, i) => (
             <Flex
               key={i}
@@ -53,7 +55,25 @@ function MessageContainer() {
                 </Flex>
             </Flex>
           ))}
+
+            <Message ownMessage={true}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={true}/>
+            <Message ownMessage={true}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={true}/>
+            <Message ownMessage={true}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={true}/>
+            <Message ownMessage={true}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={false}/>
+            <Message ownMessage={true}/>
       </Flex>
+      <MessageInput />
     </Flex>
   );
 }

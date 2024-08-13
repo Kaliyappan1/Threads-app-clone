@@ -1,6 +1,5 @@
 import { SearchIcon } from "@chakra-ui/icons";
 import {
-  border,
   Box,
   Button,
   Flex,
@@ -10,9 +9,7 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import React from "react";
 import Conversation from "../components/Conversation";
-import { GiConversation } from "react-icons/gi";
 import MessageContainer from "../components/MessageContainer";
 
 function ChatPage() {
