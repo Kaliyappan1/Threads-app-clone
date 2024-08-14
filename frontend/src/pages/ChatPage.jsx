@@ -14,8 +14,9 @@ import Conversation from "../components/Conversation";
 import MessageContainer from "../components/MessageContainer";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { conversationsAtom, selectedConversationsAtom } from "../atoms/messagesAtom";
+import userAtom from "../atoms/userAtom";
 
 function ChatPage() {
   const showToast = useShowToast();
@@ -25,6 +26,9 @@ function ChatPage() {
     selectedConversationsAtom
   );
 
+  const [searchText, setSearchText] = useState("");
+  const [searchingUser, setSearchingUser]=  useState(false);
+  const currentUser = useRecoilValue(userAtom)
   useEffect(() => {
     const getConversations = async () => {
       try {
@@ -45,6 +49,42 @@ function ChatPage() {
 
     getConversations();
   }, [showToast, setConversations]);
+
+  const handleConversationSearch = async(e) => {
+    e.preventDefault();
+    setSearchingUser(true);
+    try {
+      const res = await fetch(`/api/users/profile/${searchText}`);
+      const searchedUser = await res.json();
+      if (searchedUser.error) {
+        showToast("Error", searchedUser.error, "error");
+        return;
+      }
+      const messagingYourself = searchedUser._id === currentUser._id;
+      if (messagingYourself) {
+        showToast("Error", "You cannot message yourself", "error");
+        return;
+      }
+     
+      
+      if (conversations.find((conversation) => conversation.participants[0]._id === searchedUser._id)) {
+        setSelectedConversation({
+        id: conversations.find((conversation) => conversation.participants[0]._id === searchedUser._id)
+          ._id,
+          userId: searchedUser._id,
+          username: searchedUser.username,
+          userProfilePicture: searchedUser.profilePic,
+        });
+        return;
+      }
+
+    } catch (error) {
+      showToast("Error", error.message, "error");
+    }finally{
+      setSearchingUser(false);
+    }
+  }
+
 
   return (
     <Box
@@ -82,10 +122,10 @@ function ChatPage() {
           >
             Your Conversations
           </Text>
-          <form>
+          <form onSubmit={handleConversationSearch}>
             <Flex alignItems={"center"} gap={2}>
-              <Input placeholder="Search for a user" />
-              <Button size={"sm"}>
+              <Input placeholder="Search for a user" onChange={(e) => setSearchText(e.target.value)} />
+              <Button size={"sm"} onClick={handleConversationSearch} isLoading={searchingUser}>
                 <SearchIcon />
               </Button>
             </Flex>

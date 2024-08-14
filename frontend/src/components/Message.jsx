@@ -5,7 +5,7 @@ import userAtom from "../atoms/userAtom";
 function Message({ownMessage, message}) {
   const selectedConversation = useRecoilValue(selectedConversationsAtom)
   const user = useRecoilValue(userAtom);
-  console.log(user);
+  // console.log(user);
   
   return (
     <>
@@ -20,7 +20,7 @@ function Message({ownMessage, message}) {
         <Flex gap={2}>
           <Avatar src={selectedConversation.userProfilePic} w={7} h={7} />
           <Text maxW={"350px"} bg={"gray.300"} color={"black"} p={2} borderRadius={"md"}>
-            {message.text}
+          {message.text}
           </Text>
         </Flex>
       )}

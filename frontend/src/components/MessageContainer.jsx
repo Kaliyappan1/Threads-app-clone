@@ -27,6 +27,8 @@ function MessageContainer() {
   const currentUser = useRecoilValue(userAtom);
   useEffect(() => {
     const getMessages = async () => {
+      setLoadingMessages(true);
+      setMessages([]);
       try {
         const res = await fetch(`/api/messages/${selectedConversation.userId}`);
         const data = await res.json();
@@ -37,7 +39,7 @@ function MessageContainer() {
         setMessages(data);
       } catch (error) {
         showToast("Error", error.meesage, "error");
-      }finally{
+      } finally {
         setLoadingMessages(false);
       }
     };
@@ -52,10 +54,12 @@ function MessageContainer() {
       p={2}
       flexDirection={"column"}
     >
+      {/* Message Header */}
       <Flex w={"full"} h={12} alignItems={"center"} gap={2}>
-        <Avatar src="" size={"sm"} />
+        <Avatar src={selectedConversation.userProfilePic} size={"sm"} />
         <Text display={"flex"} alignItems={"center"}>
-          kaliyappan <Image src="/verified.png" w={4} h={4} ml={1} />
+          {selectedConversation.username}{" "}
+          <Image src="/verified.png" w={4} h={4} ml={1} />
         </Text>
       </Flex>
 
@@ -87,13 +91,16 @@ function MessageContainer() {
             </Flex>
           ))}
 
-        {!loadingMessages && (
+        {!loadingMessages &&
           messages.map((message) => (
-            <Message key={message._id} message={message} ownMessage={currentUser._id === message.sender} />
-          ))
-        )}
+            <Message
+              key={message._id}
+              message={message}
+              ownMessage={currentUser._id === message.sender}
+            />
+          ))}
       </Flex>
-      <MessageInput />
+      <MessageInput setMessages={setMessages} />
     </Flex>
   );
 }

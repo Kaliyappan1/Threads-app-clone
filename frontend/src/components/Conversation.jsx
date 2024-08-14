@@ -24,7 +24,7 @@ function Conversation({ conversation }) {
   );
   const colorMode = useColorMode();
 
-  console.log("selectedConversation", selectedConversation);
+  // console.log("selectedConversation", selectedConversation);
 
   return (
     <Flex
