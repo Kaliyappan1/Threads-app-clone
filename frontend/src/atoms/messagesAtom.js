@@ -1,17 +1,16 @@
-import {atom} from 'recoil';
+import { atom } from "recoil";
 
 export const conversationsAtom = atom({
-    key: 'conversationsAtom',
-    default: [],
-})
+	key: "conversationsAtom",
+	default: [],
+});
 
-
-export const selectedConversationsAtom = atom({
-    key: "selectedConversationsAtom",
-    default: {
-        _id: "",
-        userId: "",
-        username: "",
-        userProfilePic: "",
-    }
-})
+export const selectedConversationAtom = atom({
+	key: "selectedConversationAtom",
+	default: {
+		_id: "",
+		userId: "",
+		username: "",
+		userProfilePic: "",
+	},
+});
