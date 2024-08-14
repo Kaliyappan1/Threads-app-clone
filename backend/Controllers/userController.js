@@ -1,15 +1,19 @@
-import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
+import Post from "../models/postModel.js";
+import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
-import Post from "../models/postModel.js";
+
 const getUserProfile = async (req, res) => {
+  // We will fetch user profile either with username or userId
+  // query is either username or userId
   const { query } = req.params;
+
   try {
     let user;
 
-    //query is userId
+    // query is userId
     if (mongoose.Types.ObjectId.isValid(query)) {
       user = await User.findOne({ _id: query })
         .select("-password")
@@ -21,13 +25,12 @@ const getUserProfile = async (req, res) => {
         .select("-updatedAt");
     }
 
-    if (!user) {
-      return res.status(400).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
+
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in getUser profile", err.message);
+    console.log("Error in getUserProfile: ", err.message);
   }
 };
 
@@ -39,7 +42,6 @@ const signupUser = async (req, res) => {
     if (user) {
       return res.status(400).json({ error: "User already exists" });
     }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -67,7 +69,7 @@ const signupUser = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in signupUser", err.message);
+    console.log("Error in signupUser: ", err.message);
   }
 };
 
@@ -83,6 +85,11 @@ const loginUser = async (req, res) => {
     if (!user || !isPasswordCorrect)
       return res.status(400).json({ error: "Invalid username or password" });
 
+    if (user.isFrozen) {
+      user.isFrozen = false;
+      await user.save();
+    }
+
     generateTokenAndSetCookie(user._id, res);
 
     res.status(200).json({
@@ -93,24 +100,19 @@ const loginUser = async (req, res) => {
       bio: user.bio,
       profilePic: user.profilePic,
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-    console.log("Error in loginUser", err.message);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+    console.log("Error in loginUser: ", error.message);
   }
 };
 
 const logoutUser = (req, res) => {
   try {
-    res.cookie("jwt", "", {
-      httpOnly: true, // Prevents JavaScript access to the cookie
-      sameSite: "strict", // CSRF protection
-      secure: process.env.NODE_ENV === "production", // Secure flag based on environment
-      maxAge: 0, // Setting maxAge to 0 effectively deletes the cookie
-    });
+    res.cookie("jwt", "", { maxAge: 1 });
     res.status(200).json({ message: "User logged out successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in logoutUser: ", err.message); // Updated error logging
+    console.log("Error in signupUser: ", err.message);
   }
 };
 
@@ -123,7 +125,7 @@ const followUnFollowUser = async (req, res) => {
     if (id === req.user._id.toString())
       return res
         .status(400)
-        .json({ message: "you cannot follow/unfollow yourself" });
+        .json({ error: "You cannot follow/unfollow yourself" });
 
     if (!userToModify || !currentUser)
       return res.status(400).json({ error: "User not found" });
@@ -143,7 +145,7 @@ const followUnFollowUser = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in followunfollow ", err.message);
+    console.log("Error in followUnFollowUser: ", err.message);
   }
 };
 
@@ -152,21 +154,17 @@ const updateUser = async (req, res) => {
   let { profilePic } = req.body;
 
   const userId = req.user._id;
-
   try {
     let user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({ error: "user not found" });
-    }
+    if (!user) return res.status(400).json({ error: "User not found" });
 
-    if (req.params.id !== userId.toString()) {
+    if (req.params.id !== userId.toString())
       return res
         .status(400)
         .json({ error: "You cannot update other user's profile" });
-    }
 
     if (password) {
-      const salt = await bcrypt.getSalt(10);
+      const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
     }
@@ -177,6 +175,7 @@ const updateUser = async (req, res) => {
           user.profilePic.split("/").pop().split(".")[0]
         );
       }
+
       const uploadedResponse = await cloudinary.uploader.upload(profilePic);
       profilePic = uploadedResponse.secure_url;
     }
@@ -189,8 +188,7 @@ const updateUser = async (req, res) => {
 
     user = await user.save();
 
-    // find all posts that this user replied and update username and userProfilePic fields
-
+    // Find all posts that this user replied and update username and userProfilePic fields
     await Post.updateMany(
       { "replies.userId": userId },
       {
@@ -202,12 +200,59 @@ const updateUser = async (req, res) => {
       { arrayFilters: [{ "reply.userId": userId }] }
     );
 
+    // password should be null in response
     user.password = null;
 
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in updateUser : ", err.message);
+    console.log("Error in updateUser: ", err.message);
+  }
+};
+
+const getSuggestedUsers = async (req, res) => {
+  try {
+    // exclude the current user from suggested users array and exclude users that current user is already following
+    const userId = req.user._id;
+
+    const usersFollowedByYou = await User.findById(userId).select("following");
+
+    const users = await User.aggregate([
+      {
+        $match: {
+          _id: { $ne: userId },
+        },
+      },
+      {
+        $sample: { size: 10 },
+      },
+    ]);
+    const filteredUsers = users.filter(
+      (user) => !usersFollowedByYou.following.includes(user._id)
+    );
+    const suggestedUsers = filteredUsers.slice(0, 4);
+
+    suggestedUsers.forEach((user) => (user.password = null));
+
+    res.status(200).json(suggestedUsers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const freezeAccount = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    user.isFrozen = true;
+    await user.save();
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -218,4 +263,6 @@ export {
   followUnFollowUser,
   updateUser,
   getUserProfile,
+  getSuggestedUsers,
+  freezeAccount,
 };
