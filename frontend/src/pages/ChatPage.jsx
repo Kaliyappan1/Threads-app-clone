@@ -9,17 +9,21 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
+import {GiConversation} from "react-icons/gi";
 import Conversation from "../components/Conversation";
 import MessageContainer from "../components/MessageContainer";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { useRecoilState } from "recoil";
-import { conversationsAtom } from "../atoms/messagesAtom";
+import { conversationsAtom, selectedConversationsAtom } from "../atoms/messagesAtom";
 
 function ChatPage() {
   const showToast = useShowToast();
   const [loadingConversations, setLoadingConversations] = useState(true);
   const [conversations, setConversations] = useRecoilState(conversationsAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationsAtom
+  );
 
   useEffect(() => {
     const getConversations = async () => {
@@ -107,7 +111,7 @@ function ChatPage() {
             ))}
 
           {!loadingConversations &&
-            conversations.map((conversation) => (
+            conversations.map(conversation => (
               <Conversation
                 key={conversation._id}
                 conversation={conversation}
@@ -115,7 +119,9 @@ function ChatPage() {
             ))}
         </Flex>
 
-        {/* <Flex
+        {!selectedConversation._id && (
+
+        <Flex
           flex={70}
           borderRadius={"md"}
           p={2}
@@ -126,8 +132,9 @@ function ChatPage() {
         >
           <GiConversation size={100} />
           <Text fontSize={20}>Select a conversation to start messaging</Text>
-        </Flex> */}
-        <MessageContainer />
+        </Flex>
+        )}
+        {selectedConversation._id && <MessageContainer />}
       </Flex>
     </Box>
   );

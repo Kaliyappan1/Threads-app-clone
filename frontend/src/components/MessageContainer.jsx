@@ -10,8 +10,39 @@ import {
 } from "@chakra-ui/react";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
+import { useEffect, useState } from "react";
+import useShowToast from "../hooks/useShowToast";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { selectedConversationsAtom } from "../atoms/messagesAtom";
+import userAtom from "../atoms/userAtom";
 
 function MessageContainer() {
+  const showToast = useShowToast();
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationsAtom
+  );
+
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [messages, setMessages] = useState([]);
+  const currentUser = useRecoilValue(userAtom);
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const res = await fetch(`/api/messages/${selectedConversation.userId}`);
+        const data = await res.json();
+        if (data.error) {
+          showToast("Error", data.error, "error");
+          return;
+        }
+        setMessages(data);
+      } catch (error) {
+        showToast("Error", error.meesage, "error");
+      }finally{
+        setLoadingMessages(false);
+      }
+    };
+    getMessages();
+  }, [showToast, selectedConversation.userId]);
 
   return (
     <Flex
@@ -38,7 +69,7 @@ function MessageContainer() {
         height={"400px"}
         overflowY={"auto"}
       >
-        {false &&
+        {loadingMessages &&
           [...Array(5)].map((_, i) => (
             <Flex
               key={i}
@@ -48,20 +79,19 @@ function MessageContainer() {
               borderRadius={"md"}
               alignSelf={i % 2 === 0 ? "flex-start" : "flex-end"}
             >
-                {i % 2 === 0 && <SkeletonCircle size={7} /> }
-                <Flex flexDir={"column"} gap={2}>
-                    <Skeleton h={"16px"} w={"250px"} />
-                    <Skeleton h={"8px"} w={"250px"} />
-                    <Skeleton h={"8px"} w={"250px"} />
-                </Flex>
+              {i % 2 === 0 && <SkeletonCircle size={7} />}
+              <Flex flexDir={"column"} gap={2}>
+                <Skeleton h={"16px"} w={"250px"} />
+                <Skeleton h={"8px"} w={"250px"} />
+              </Flex>
             </Flex>
           ))}
 
-            <Message ownMessage={true}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={false}/>
-            <Message ownMessage={true}/>
-            <Message ownMessage={true}/>
+        {!loadingMessages && (
+          messages.map((message) => (
+            <Message key={message._id} message={message} ownMessage={currentUser._id === message.sender} />
+          ))
+        )}
       </Flex>
       <MessageInput />
     </Flex>
