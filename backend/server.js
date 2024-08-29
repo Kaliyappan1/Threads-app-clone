@@ -30,7 +30,6 @@ app.use(
     origin: ["https://kaliyappan-threads-clone.onrender.com"],
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
-    credentials: true
   })
 );
 
